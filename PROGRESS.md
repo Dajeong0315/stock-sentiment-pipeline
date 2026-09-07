@@ -33,11 +33,17 @@ GitHub 원격 저장소(https://github.com/Dajeong0315/stock-sentiment-pipeline)
 - [x] GitHub Actions CI (린트/테스트) — `.github/workflows/ci.yml` 작성, 로컬에서 ruff+pytest
       (16개 테스트) 통과 확인. "리포트 자동 커밋" 워크플로(`report.yml`)도 작성했으나
       수동 트리거 전용이며 **GitHub 인프라에서 실제 실행 검증은 못함**
+- [x] PDF 리포트 내보내기 — 완료. Headless Chrome의 `Page.printToPDF`를 재사용(뉴스
+      수집기와 동일한 Chrome 드라이버 공유), 새 무거운 의존성 없이 한글 정상 렌더링 확인
+      (`python scripts/run_pipeline.py --mode manual --pdf`)
+- [x] 다른 종목으로 TICKER 교체 재사용성 검증 — 완료. SK하이닉스(000660.KS)로 전체
+      파이프라인 실제 실행, corp_code 자동조회 경로까지 포함해 코드 변경 없이 동작 확인
+      (README "다른 종목으로 재사용성 검증" 섹션 참고)
+- [x] Slack/이메일 알림 — 코드 작성 완료(`reports/notify.py`), 설정 안 하면 조용히
+      스킵되는 no-op 동작은 테스트로 검증. **실제 Slack/메일 서버로 발송 검증은 못함**
+      (사용 가능한 자격증명 없음)
 - [ ] KcELECTRA 파인튜닝 비교 — 미착수
 - [ ] GPU 확보 시 7B급 모델 교체 — 해당 없음 (CPU 전용 환경)
-- [ ] PDF 리포트 내보내기 — 미착수
-- [ ] Slack/이메일 알림 — 미착수
-- [ ] 다른 종목으로 TICKER 교체 재사용성 검증 — 미착수
 
 ## 알려진 한계 (정직하게 기록)
 - 뉴스 수집은 Naver 검색 결과 페이지의 제목 + 기사 자체 페이지의 `og:description` 메타 태그를 사용함 (전체 본문 크롤링 아님) — 언론사별 파서를 만들지 않는 대신 선택한 견고성 우선 설계

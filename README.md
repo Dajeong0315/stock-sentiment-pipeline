@@ -44,6 +44,7 @@ ollama pull qwen2.5:3b-instruct-q4_K_M
 ```bash
 # 전체 파이프라인 1회 수동 실행 (수집 + EDA/모델 + LLM 감정 + 대시보드용 데이터 + 리포트 + git commit)
 python scripts/run_pipeline.py --mode manual
+python scripts/run_pipeline.py --mode manual --pdf   # 마크다운 리포트를 PDF로도 내보내기
 
 # 수집만 (스케줄러가 매일 호출하는 것과 동일한 경량 모드)
 python scripts/run_pipeline.py --mode scheduled
@@ -123,6 +124,29 @@ pip install -r requirements-dev.txt
 ruff check .
 pytest tests/ -q
 ```
+
+## 알림 (선택)
+
+`.env`에 `SLACK_WEBHOOK_URL` 또는 `SMTP_*`/`NOTIFY_EMAIL_TO`를 채우면 `--mode manual` 실행
+끝에 종합 시그널 결과를 자동으로 보내준다. 둘 다 비워두면 조용히 스킵됨 — 실제 Slack
+워크스페이스/메일 서버로 검증하지는 못했고, 각 서비스의 표준 인터페이스(Slack Incoming
+Webhook, `smtplib`)에 맞춰 작성만 해둔 상태.
+
+## 다른 종목으로 재사용성 검증
+
+`.env`를 건드리지 않고 환경변수만 덮어써서 SK하이닉스(000660.KS)로 전체 파이프라인을
+실제로 돌려봤다 — corp_code를 비워두고 `DART_CORP_NAME_HINT`로 자동 조회하는 경로까지
+포함:
+
+```bash
+TICKER=000660.KS DART_CORP_CODE= DART_CORP_NAME_HINT=SK하이닉스 \
+  NEWS_SEARCH_QUERY=SK하이닉스 DB_PATH=data/test.sqlite \
+  python scripts/run_pipeline.py --mode manual
+```
+
+결과: 주가 64건/공시 16건(자동 조회된 corp_code=00164779)/뉴스 18건 수집 성공, ridge
+모델 RMSE 0.0342(baseline 0.0381 대비 개선), 규칙기반-LLM 일치율 66.7%, 종합 시그널
+BUY — 코드 변경 없이 티커만 바꿔서 끝까지 동작함을 확인함.
 
 ## Docker
 

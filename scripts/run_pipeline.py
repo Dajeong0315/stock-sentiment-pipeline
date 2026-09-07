@@ -51,7 +51,7 @@ def _git_commit(message: str):
         log.warning("git commit failed: %s", e)
 
 
-def run(mode: str):
+def run(mode: str, pdf: bool = False):
     counts = _run_collection()
 
     if mode == "scheduled":
@@ -62,6 +62,16 @@ def run(mode: str):
 
     report_result = generate_report()
     log.info("Manual run finished. report=%s", report_result["report_path"])
+
+    if pdf:
+        from reports.export_pdf import markdown_to_pdf
+
+        pdf_path = report_result["report_path"].with_suffix(".pdf")
+        markdown_to_pdf(report_result["report_path"], pdf_path)
+
+    from reports.notify import notify_run_result
+
+    notify_run_result(config.TICKER, report_result["signal"], counts)
 
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
     _git_commit(f"Pipeline run ({mode}) {timestamp}: +{counts['stock_price']}price/"
@@ -74,5 +84,6 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", choices=["scheduled", "manual"], default="manual")
+    parser.add_argument("--pdf", action="store_true", help="also export the report as PDF")
     args = parser.parse_args()
-    run(args.mode)
+    run(args.mode, pdf=args.pdf)

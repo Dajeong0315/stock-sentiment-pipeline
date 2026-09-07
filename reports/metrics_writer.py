@@ -136,7 +136,10 @@ def render_metrics(model_results: dict = None, comparison_result: dict = None, r
         "- Kubernetes: 매니페스트 작성 + `kubeconform` 오프라인 스키마 검증 통과(9개 리소스) — "
         "**실제 클러스터 배포는 미완료** (이 환경에 연결 가능한 클러스터 없음)"
     )
-    lines.append("- GitHub Actions CI: 린트/테스트 워크플로 작성 및 로컬 통과 확인 (ruff, pytest 16건)")
+    lines.append("- GitHub Actions CI: 린트/테스트 워크플로 작성 및 로컬 통과 확인 (ruff, pytest 18건)")
+    lines.append("- PDF 리포트 내보내기: 완료 (headless Chrome 재사용, `--pdf` 옵션)")
+    lines.append("- 다른 종목(SK하이닉스 000660.KS) 재사용성: 완료 — 코드 변경 없이 전체 파이프라인 실행 검증")
+    lines.append("- Slack/이메일 알림: 코드 작성 완료, 실제 발송 검증은 못함 (자격증명 없음)")
     lines.append("")
 
     return "\n".join(lines)

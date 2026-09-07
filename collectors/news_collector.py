@@ -21,14 +21,11 @@ from datetime import datetime, timedelta
 
 import requests
 from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
-from webdriver_manager.chrome import ChromeDriverManager
 
 import config
 from collectors import naver_selectors as sel
+from collectors.chrome_driver import USER_AGENT, build_headless_chrome
 from db.db import get_conn, insert_news
 from nlp.rule_sentiment import score_text
 from nlp.text_clean import clean_text
@@ -37,7 +34,7 @@ log = logging.getLogger(__name__)
 
 _RELATIVE_RE = re.compile(r"(\d+)\s*(분|시간|일)\s*전")
 _ABSOLUTE_RE = re.compile(r"(\d{4})\.(\d{2})\.(\d{2})\.?")
-_HTTP_HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+_HTTP_HEADERS = {"User-Agent": USER_AGENT}
 _MIN_USEFUL_DESCRIPTION_LEN = 20
 _A11Y_BOILERPLATE_RE = re.compile(r"새\s*창\s*열림")
 
@@ -68,16 +65,6 @@ def _parse_naver_date(text: str) -> str:
         return f"{m.group(1)}-{m.group(2)}-{m.group(3)}"
 
     return now.strftime("%Y-%m-%d")
-
-
-def _build_driver():
-    options = Options()
-    options.add_argument("--headless=new")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("window-size=1920,1080")
-    options.add_argument(f"user-agent={_HTTP_HEADERS['User-Agent']}")
-    return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 
 def _find_headline_anchor(profile_el):
@@ -138,7 +125,7 @@ def collect_news(max_articles: int = None):
     query = config.NEWS_SEARCH_QUERY
     url = config.NAVER_NEWS_SEARCH_URL.format(query=query)
 
-    driver = _build_driver()
+    driver = build_headless_chrome()
     try:
         driver.get(url)
         try:
