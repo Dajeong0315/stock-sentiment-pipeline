@@ -1,5 +1,6 @@
 """Recomputes and rewrites METRICS.md from current DB + model/sentiment results.
 Idempotent — always reflects the latest state, not an append-only log."""
+import json
 import logging
 import subprocess
 from datetime import datetime
@@ -12,6 +13,7 @@ from db.db import count_rows, get_conn
 log = logging.getLogger(__name__)
 
 METRICS_PATH = config.BASE_DIR / "METRICS.md"
+KCELECTRA_RESULT_PATH = config.BASE_DIR / "analysis" / "kcelectra_comparison_result.json"
 
 # Rough estimate: manual collection (price + disclosure + news, reading/copying by hand)
 # takes about this long per run for one ticker. Used only for the "시간 절약" line —
@@ -130,6 +132,37 @@ def render_metrics(model_results: dict = None, comparison_result: dict = None, r
     )
     lines.append("")
 
+    lines.append("## KcELECTRA 파인튜닝 vs 로컬 LLM(zero-shot) vs 규칙기반 비교")
+    if KCELECTRA_RESULT_PATH.exists():
+        r = json.loads(KCELECTRA_RESULT_PATH.read_text(encoding="utf-8"))
+        lines.append(
+            f"- 직접 라벨링한 {r['n_train'] + r['n_test']}건(train={r['n_train']}/test={r['n_test']})으로 "
+            "KcELECTRA-base를 4 epoch 파인튜닝, 같은 held-out 라벨로 3개 방식 정확도 비교:"
+        )
+        lines.append(f"  - 전체 정확도 — 규칙기반 {r['rule_based_accuracy']:.0%} / "
+                      f"LLM zero-shot {r['llm_zero_shot_accuracy']:.0%} / "
+                      f"KcELECTRA {r['kcelectra_accuracy']:.0%}")
+        lines.append(
+            f"  - **중립 제외(진짜 판단이 필요한 사례만, n={r['n_test_non_neutral']})** — "
+            f"규칙기반 {r['rule_based_accuracy_non_neutral']:.0%} / "
+            f"LLM {r['llm_accuracy_non_neutral']:.0%} / "
+            f"KcELECTRA {r['kcelectra_accuracy_non_neutral']:.0%}"
+        )
+        lines.append(
+            "- 해석: KcELECTRA는 훈련 36건으로는 절대량이 부족해 다수 클래스(중립)로 **모드 붕괴**"
+            "(모든 테스트 샘플을 중립으로만 예측)됐음 — 전체 정확도 50%는 우연히 중립 비율과 맞아떨어진 "
+            "것일 뿐, 실제 판단 능력은 0%. 표본이 매우 작아(n=10) 통계적으로 일반화할 수 없지만, "
+            "**\"파인튜닝이 항상 zero-shot보다 낫다\"는 가정이 데이터가 부족하면 깨질 수 있다**는 것을 "
+            "직접 실험으로 확인함. 규칙기반이 이 표본에서 100%인 것도 실력이 아니라 이 테스트셋에 "
+            "우연히 사전 매칭 사례만 포함된 결과 — 과대 해석 금지."
+        )
+    else:
+        lines.append(
+            "- (미실행 — `pip install -r requirements-kcelectra.txt` 후 "
+            "`python -m analysis.kcelectra_finetune` 실행 필요)"
+        )
+    lines.append("")
+
     lines.append("## 확장 범위 진행 상태")
     lines.append("- Docker: 완료 — 이미지 크기 2.65GB (빌드 및 `docker compose up` 실구동 검증 완료)")
     lines.append(
@@ -140,6 +173,7 @@ def render_metrics(model_results: dict = None, comparison_result: dict = None, r
     lines.append("- PDF 리포트 내보내기: 완료 (headless Chrome 재사용, `--pdf` 옵션)")
     lines.append("- 다른 종목(SK하이닉스 000660.KS) 재사용성: 완료 — 코드 변경 없이 전체 파이프라인 실행 검증")
     lines.append("- Slack/이메일 알림: 코드 작성 완료, 실제 발송 검증은 못함 (자격증명 없음)")
+    lines.append("- KcELECTRA 파인튜닝 비교: 완료 — 위 섹션 참고 (모드 붕괴라는 예상 밖의 결과 발견)")
     lines.append("")
 
     return "\n".join(lines)

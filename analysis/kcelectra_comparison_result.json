@@ -1,0 +1,83 @@
+{
+  "n_train": 36,
+  "n_test": 10,
+  "n_test_non_neutral": 5,
+  "kcelectra_accuracy": 0.5,
+  "llm_zero_shot_accuracy": 0.4,
+  "rule_based_accuracy": 1.0,
+  "kcelectra_accuracy_non_neutral": 0.0,
+  "llm_accuracy_non_neutral": 0.8,
+  "rule_based_accuracy_non_neutral": 1.0,
+  "examples": [
+    {
+      "text": "삼성전자도 안 하는데 카카오 쪼개기에 개미들 반기 삼성전자도 안 하는데 카카오 쪼개기에 개미들 반기 , 액트",
+      "true": 0,
+      "rule": 0,
+      "llm": -1,
+      "kcelectra": 0
+    },
+    {
+      "text": "삼성, 하반기 공채 8일부터 실시 삼성전자등 19개 회사 삼성이 8일부터 올해 하반기 신입사원 공개채용을 실",
+      "true": 0,
+      "rule": 0,
+      "llm": 1,
+      "kcelectra": 0
+    },
+    {
+      "text": "2분기 D램 시장 60% 삼성전자선두 올해 2분기 글로벌 D램 시장이 전분기 대비 60% 가까이 성장한 것으",
+      "true": 1,
+      "rule": 1,
+      "llm": 1,
+      "kcelectra": 0
+    },
+    {
+      "text": "성과급은 노사 교섭대상 아냐 뿔난 주주단체,삼성전자이사회 노조... 삼성전자와 SK하이닉스 대표이사를 성과급",
+      "true": -1,
+      "rule": -1,
+      "llm": -1,
+      "kcelectra": 0
+    },
+    {
+      "text": "삼전 닉스 3분기 실적 눈높이 쑥 주가 반등세 이어질까 종합 서울 연합뉴스 이민영 기자 삼성전자와 SK하이닉",
+      "true": 1,
+      "rule": 1,
+      "llm": 1,
+      "kcelectra": 0
+    },
+    {
+      "text": "삼전닉스 실적 더 간다 AI 투자 폭증에 메모리 공급 빡빡 삼전닉스 실적 더 간다 AI 투자 폭증에 메모리 ",
+      "true": 1,
+      "rule": 1,
+      "llm": -1,
+      "kcelectra": 0
+    },
+    {
+      "text": "이코노뉴스 경제와 산업 중심의 심층기사와 칼럼을 지향하는 인터넷 신문",
+      "true": 0,
+      "rule": 0,
+      "llm": 1,
+      "kcelectra": 0
+    },
+    {
+      "text": "삼성그룹 19개사 동시 공채 청년 일자리 큰 장 열린다 15일까지 커리어스 로 지원서 접수4대그룹중 공채 유",
+      "true": 0,
+      "rule": 0,
+      "llm": 1,
+      "kcelectra": 0
+    },
+    {
+      "text": "삼성 하반기 공채 스타트 삼성전자등 19개사 참여 삼성 하반기 공채 스타트 삼성전자 등 19개사 참여, 강홍",
+      "true": 0,
+      "rule": 0,
+      "llm": 1,
+      "kcelectra": 0
+    },
+    {
+      "text": "주주단체,삼성전자이사회 경찰 고발... 성과급 배임 공범 대한민국 주주운동본부가 삼성전자와 SK하이닉스 대표",
+      "true": -1,
+      "rule": -1,
+      "llm": -1,
+      "kcelectra": 0
+    }
+  ]
+}
