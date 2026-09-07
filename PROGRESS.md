@@ -6,7 +6,7 @@
 - [x] 수집 스크립트가 3개 소스 각각 정상 실행되어 SQLite에 새 row가 append됨
   - 주가(yfinance): 동작 확인 (64건)
   - 뉴스(Naver 검색, Selenium): 동작 확인 (24건, 규칙기반 점수화 포함)
-  - 공시(OpenDART): 코드 완성, **API 키 미설정으로 실제 실행 미검증** — `.env`에 `OPENDART_API_KEY` 입력 후 `python -m collectors.dart_collector`로 확인 필요
+  - 공시(OpenDART): 동작 확인 (실제 API 키로 삼성전자 공시 18건 수집, corp_code=00126380 정확성 확인됨)
 - [x] 규칙기반 감정점수화가 뉴스 텍스트에 대해 정상 동작함 (정규식 정제 + Kiwi 형태소분석 + 수작업 사전)
 - [x] 예측모델이 에러 없이 학습·추론 완료되고 RMSE가 METRICS.md에 기록됨 (Ridge/RandomForest, baseline 대비 결과는 METRICS.md 참고)
 - [x] Ollama 로컬 LLM(Qwen2.5-3B-Instruct, 4bit)이 뉴스 텍스트에 대해 감정점수를 반환하고, 규칙기반과의 비교표/차트가 생성됨 (일치율 54.2%, n=24)
@@ -17,11 +17,13 @@
 - [x] 매 실행마다 git commit 로그가 남음 (`scripts/run_pipeline.py`가 manual 모드에서 자동 커밋)
 
 ## 남은 작업 (MVP 마무리)
-1. 사용자가 OpenDART API 키를 `.env`에 입력하면 공시 수집 실제 실행 검증 (코드/스키마는 완성, 실 API 키로만 미검증)
+전부 완료. 남은 것은 선택사항: `scheduler/daily_job.py`를 실제로 장시간 띄워 매일 08:00
+자동 수집이 실행되는지는 로컬에서 사용자가 직접 확인 필요 (모듈 임포트와 job 함수 단발
+실행은 검증됨).
 
-완료됨: PORTFOLIO_NOTES.md 1차 작성, `--mode scheduled`/`--mode manual` 양쪽 실행 검증,
-`scheduler/daily_job.py` 모듈 임포트 및 job 함수 단발 검증(장시간 블로킹 구동 자체는 로컬에서
-사용자가 직접 띄워 확인 필요), Streamlit 대시보드 브라우저 렌더링 확인.
+완료됨: 3개 소스 전부 실제 API/사이트로 수집 검증, PORTFOLIO_NOTES.md 1차 작성,
+`--mode scheduled`/`--mode manual` 양쪽 실행 검증, Streamlit 대시보드 브라우저 렌더링 확인,
+GitHub 원격 저장소(https://github.com/Dajeong0315/stock-sentiment-pipeline) 연결 및 push 완료.
 
 ## 확장 범위 진행 상태 (MVP 완료 전에는 착수하지 않음)
 - [ ] Docker 컨테이너화 — 미착수

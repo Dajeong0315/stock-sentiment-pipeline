@@ -8,7 +8,7 @@
 대상 종목은 예시로 삼성전자(`005930.KS`)를 쓰지만 `.env`의 `TICKER`/`DART_CORP_CODE`만
 바꾸면 다른 종목에도 그대로 적용되도록 설계했다.
 
-**현재 완료 단계: MVP 완료** (공시 수집은 OpenDART API 키 설정 후 최종 검증 필요 — [PROGRESS.md](PROGRESS.md) 참고)
+**현재 완료 단계: MVP 완료** (3개 데이터 소스 전부 실제 수집 검증 완료 — [PROGRESS.md](PROGRESS.md) 참고)
 **확장 범위(Docker/K8s/CI 등)는 착수하지 않음** — 자세한 내용은 [PORTFOLIO_NOTES.md](PORTFOLIO_NOTES.md) 참고.
 
 ## 실행 환경
