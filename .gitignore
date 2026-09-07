@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+data/*.sqlite
+data/*.sqlite-journal
+logs/*.log
+.ipynb_checkpoints/
+*.egg-info/
+.streamlit/
+chromedriver*
