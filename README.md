@@ -125,6 +125,18 @@ ruff check .
 pytest tests/ -q
 ```
 
+## KcELECTRA 파인튜닝 비교 (선택, 무거운 의존성)
+
+```bash
+pip install -r requirements-kcelectra.txt   # torch(CPU) + transformers 추가 설치
+python -m analysis.kcelectra_finetune
+```
+
+직접 라벨링한 뉴스 46건(`analysis/manual_labels.json`)으로 KcELECTRA-base를 파인튜닝해서
+규칙기반/zero-shot LLM과 정확도를 비교한다. 결과는 `analysis/kcelectra_comparison_result.json`에
+저장되고, METRICS.md에 자동 반영된다. **예상 밖의 결과**: 학습 데이터가 36건뿐이라 KcELECTRA가
+다수 클래스(중립)로 모드 붕괴해버렸다 — 자세한 내용은 METRICS.md, PORTFOLIO_NOTES.md 참고.
+
 ## 알림 (선택)
 
 `.env`에 `SLACK_WEBHOOK_URL` 또는 `SMTP_*`/`NOTIFY_EMAIL_TO`를 채우면 `--mode manual` 실행

@@ -42,7 +42,10 @@ GitHub 원격 저장소(https://github.com/Dajeong0315/stock-sentiment-pipeline)
 - [x] Slack/이메일 알림 — 코드 작성 완료(`reports/notify.py`), 설정 안 하면 조용히
       스킵되는 no-op 동작은 테스트로 검증. **실제 Slack/메일 서버로 발송 검증은 못함**
       (사용 가능한 자격증명 없음)
-- [ ] KcELECTRA 파인튜닝 비교 — 미착수
+- [x] KcELECTRA 파인튜닝 비교 — 완료. 뉴스 46건 직접 라벨링 → KcELECTRA-base 파인튜닝
+      → 규칙기반/zero-shot LLM과 동일 held-out 테스트셋으로 비교. **예상 밖 발견**:
+      학습 데이터 부족(36건)으로 KcELECTRA가 다수 클래스(중립)로 모드 붕괴 — 비중립
+      사례 정확도 0% (규칙기반 100%, LLM 80%). 자세한 내용은 METRICS.md/PORTFOLIO_NOTES.md
 - [ ] GPU 확보 시 7B급 모델 교체 — 해당 없음 (CPU 전용 환경)
 
 ## 알려진 한계 (정직하게 기록)
