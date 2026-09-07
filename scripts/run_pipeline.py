@@ -43,8 +43,10 @@ def _git_commit(message: str):
         )
         if result.returncode == 0:
             log.info("git commit created: %s", message)
+        elif "nothing to commit" in result.stdout:
+            log.info("git commit skipped: nothing changed")
         else:
-            log.info("git commit skipped (likely nothing to commit): %s", result.stdout.strip())
+            log.warning("git commit failed (%d): %s", result.returncode, (result.stdout + result.stderr).strip())
     except (subprocess.CalledProcessError, FileNotFoundError) as e:
         log.warning("git commit failed: %s", e)
 
