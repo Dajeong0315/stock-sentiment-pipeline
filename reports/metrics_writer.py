@@ -1,6 +1,7 @@
 """Recomputes and rewrites METRICS.md from current DB + model/sentiment results.
 Idempotent — always reflects the latest state, not an append-only log."""
 import logging
+import subprocess
 from datetime import datetime
 
 import numpy as np
@@ -42,15 +43,31 @@ def _price_sentiment_correlation(ticker: str) -> float | None:
     return float(merged["daily_return"].corr(merged["sentiment"]))
 
 
+def _count_pipeline_runs() -> int:
+    """Counts past `Pipeline run (...)` commits so the "time saved" estimate reflects
+    actual runs instead of a hardcoded guess."""
+    try:
+        result = subprocess.run(
+            ["git", "log", "--oneline", "--grep=^Pipeline run"],
+            cwd=config.BASE_DIR,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        return max(1, len(result.stdout.strip().splitlines()))
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return 1
+
+
 def render_metrics(model_results: dict = None, comparison_result: dict = None, run_count: int = None) -> str:
     ticker = config.TICKER
+    run_count = run_count or _count_pipeline_runs()
     with get_conn() as conn:
         n_price = count_rows(conn, "stock_price")
         n_disclosure = count_rows(conn, "disclosure")
         n_news = count_rows(conn, "news")
 
     correlation = _price_sentiment_correlation(ticker)
-    run_count = run_count or 1
     saved_minutes = MANUAL_MINUTES_PER_RUN * run_count
 
     lines = [

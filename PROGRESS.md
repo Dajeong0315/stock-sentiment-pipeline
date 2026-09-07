@@ -17,9 +17,11 @@
 - [x] 매 실행마다 git commit 로그가 남음 (`scripts/run_pipeline.py`가 manual 모드에서 자동 커밋)
 
 ## 남은 작업 (MVP 마무리)
-1. 사용자가 OpenDART API 키를 `.env`에 입력하면 공시 수집 실제 실행 검증
-2. PORTFOLIO_NOTES.md 1차 작성
-3. 스케줄러(`scheduler/daily_job.py`) 장시간 구동 테스트 (현재는 코드 완성 + 단발 실행 검증만 완료)
+1. 사용자가 OpenDART API 키를 `.env`에 입력하면 공시 수집 실제 실행 검증 (코드/스키마는 완성, 실 API 키로만 미검증)
+
+완료됨: PORTFOLIO_NOTES.md 1차 작성, `--mode scheduled`/`--mode manual` 양쪽 실행 검증,
+`scheduler/daily_job.py` 모듈 임포트 및 job 함수 단발 검증(장시간 블로킹 구동 자체는 로컬에서
+사용자가 직접 띄워 확인 필요), Streamlit 대시보드 브라우저 렌더링 확인.
 
 ## 확장 범위 진행 상태 (MVP 완료 전에는 착수하지 않음)
 - [ ] Docker 컨테이너화 — 미착수
