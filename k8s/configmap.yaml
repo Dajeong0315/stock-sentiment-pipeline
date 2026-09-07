@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: stock-sentiment-config
+data:
+  TICKER: "005930.KS"
+  DART_CORP_CODE: "00126380"
+  DART_CORP_NAME_HINT: "삼성전자"
+  OLLAMA_HOST: "http://ollama:11434"
+  OLLAMA_MODEL: "qwen2.5:3b-instruct-q4_K_M"
+  DB_PATH: "data/pipeline.sqlite"

@@ -1,0 +1,53 @@
+# Manual-trigger only (not scheduled) — running the full pipeline needs Ollama + a
+# ~2GB model pull on the runner every time, which is too heavy to run on every push.
+# Requires an OPENDART_API_KEY repository secret (Settings > Secrets and variables >
+# Actions) before this can succeed.
+#
+# ponytail: not verified against a real GitHub-hosted run yet (no way to trigger and
+# watch it from this session) — written and locally reasoned through, not proven. If it
+# fails on first manual run, the Ollama install/model-pull step is the most likely culprit.
+name: Manual pipeline run + report commit
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements.txt
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+
+      - name: Install Ollama
+        run: curl -fsSL https://ollama.com/install.sh | sh
+      - name: Start Ollama + pull model
+        run: |
+          ollama serve &
+          sleep 5
+          ollama pull qwen2.5:3b-instruct-q4_K_M
+
+      - name: Write .env
+        run: |
+          cat > .env <<EOF
+          OPENDART_API_KEY=${{ secrets.OPENDART_API_KEY }}
+          TICKER=005930.KS
+          DART_CORP_CODE=00126380
+          OLLAMA_HOST=http://localhost:11434
+          OLLAMA_MODEL=qwen2.5:3b-instruct-q4_K_M
+          DB_PATH=data/pipeline.sqlite
+          EOF
+
+      - run: python scripts/run_pipeline.py --mode manual
+        # run_pipeline.py itself does `git add -A` + `git commit` on success (see
+        # scripts/run_pipeline.py::_git_commit) — this workflow only needs to push it.
+
+      - name: Push results
+        run: git push

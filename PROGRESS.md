@@ -25,12 +25,16 @@
 `--mode scheduled`/`--mode manual` 양쪽 실행 검증, Streamlit 대시보드 브라우저 렌더링 확인,
 GitHub 원격 저장소(https://github.com/Dajeong0315/stock-sentiment-pipeline) 연결 및 push 완료.
 
-## 확장 범위 진행 상태 (MVP 완료 전에는 착수하지 않음)
-- [ ] Docker 컨테이너화 — 미착수
-- [ ] Kubernetes 매니페스트 — 미착수
-- [ ] GitHub Actions CI — 미착수
+## 확장 범위 진행 상태 (MVP 완료 후 착수)
+- [x] Docker 컨테이너화 — 완료. `Dockerfile`+`docker-compose.yml`(dashboard/scheduler/ollama),
+      실제 빌드(2.65GB) 및 `docker compose up`으로 컨테이너 구동해 대시보드 정상 렌더링 확인
+- [x] Kubernetes 매니페스트 — 매니페스트 작성 + `kubeconform` 오프라인 스키마 검증(9개
+      리소스 전부 통과) 완료, **실제 클러스터 배포는 미완료** (이 환경에 클러스터 없음)
+- [x] GitHub Actions CI (린트/테스트) — `.github/workflows/ci.yml` 작성, 로컬에서 ruff+pytest
+      (16개 테스트) 통과 확인. "리포트 자동 커밋" 워크플로(`report.yml`)도 작성했으나
+      수동 트리거 전용이며 **GitHub 인프라에서 실제 실행 검증은 못함**
 - [ ] KcELECTRA 파인튜닝 비교 — 미착수
-- [ ] GPU 확보 시 7B급 모델 교체 — 미착수 (해당 없음, CPU 전용 환경)
+- [ ] GPU 확보 시 7B급 모델 교체 — 해당 없음 (CPU 전용 환경)
 - [ ] PDF 리포트 내보내기 — 미착수
 - [ ] Slack/이메일 알림 — 미착수
 - [ ] 다른 종목으로 TICKER 교체 재사용성 검증 — 미착수

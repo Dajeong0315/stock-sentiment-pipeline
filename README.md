@@ -8,8 +8,10 @@
 대상 종목은 예시로 삼성전자(`005930.KS`)를 쓰지만 `.env`의 `TICKER`/`DART_CORP_CODE`만
 바꾸면 다른 종목에도 그대로 적용되도록 설계했다.
 
-**현재 완료 단계: MVP 완료** (3개 데이터 소스 전부 실제 수집 검증 완료 — [PROGRESS.md](PROGRESS.md) 참고)
-**확장 범위(Docker/K8s/CI 등)는 착수하지 않음** — 자세한 내용은 [PORTFOLIO_NOTES.md](PORTFOLIO_NOTES.md) 참고.
+**현재 완료 단계: MVP 완료 + 확장 일부 완료.** MVP는 3개 데이터 소스 전부 실제 수집
+검증 완료. 확장 중 Docker(빌드+실제 구동 검증)와 CI 린트/테스트(로컬 통과 확인)는 완료,
+Kubernetes는 매니페스트 작성 + 오프라인 스키마 검증까지만 진행하고 **실제 클러스터 배포는
+미완료** — 자세한 구분은 [PROGRESS.md](PROGRESS.md), [PORTFOLIO_NOTES.md](PORTFOLIO_NOTES.md) 참고.
 
 ## 실행 환경
 
@@ -108,7 +110,51 @@ dashboard/                 # Streamlit 대시보드
 reports/                   # 마크다운 리포트 생성 + METRICS.md 자동 갱신
 scheduler/                 # APScheduler 기반 일 1회 자동 수집
 scripts/run_pipeline.py    # 전체 진입점 (scheduled/manual 분기)
+tests/                      # pytest — 외부 API/브라우저 의존 없는 순수 로직만
+k8s/                         # Kubernetes 매니페스트 (실제 클러스터 배포는 미완 — 위 섹션 참고)
+Dockerfile, docker-compose.yml   # Docker 컨테이너화
+.github/workflows/          # CI (린트/테스트) + 수동 트리거 리포트 자동 커밋
 ```
+
+## 테스트
+
+```bash
+pip install -r requirements-dev.txt
+ruff check .
+pytest tests/ -q
+```
+
+## Docker
+
+```bash
+docker compose up -d ollama dashboard   # 대시보드 + Ollama
+docker compose exec ollama ollama pull qwen2.5:3b-instruct-q4_K_M   # 최초 1회
+docker compose run --rm scheduler python scripts/run_pipeline.py --mode manual  # 전체 파이프라인 1회
+docker compose up -d scheduler          # 매일 자동 수집
+```
+
+이미지 크기: 2.65GB (Selenium용 Chromium 브라우저 번들이 대부분을 차지 — 자세한 내용은
+[PORTFOLIO_NOTES.md](PORTFOLIO_NOTES.md) 참고)
+
+## Kubernetes (설계 + 스키마 검증까지만 진행, 실제 클러스터 배포는 미완)
+
+`k8s/` 디렉터리에 매니페스트 작성 완료. 이 환경에는 붙일 수 있는 실제 클러스터가 없어서
+`kubectl apply --dry-run`은 시도하지 못했고, 대신 `kubeconform`(오프라인 K8s 스키마 검증
+도구)으로 9개 리소스(5개 파일) 전부 스키마 유효성 검증을 통과시켰다:
+
+```bash
+docker run --rm -v "$(pwd)/k8s:/k8s" ghcr.io/yannh/kubeconform:latest -summary /k8s
+# Summary: 9 resources found in 5 files - Valid: 9, Invalid: 0, Errors: 0, Skipped: 0
+```
+
+```bash
+kubectl apply -f k8s/configmap.yaml
+cp k8s/secret.example.yaml k8s/secret.yaml   # 값 채운 뒤 (git에 커밋 금지)
+kubectl apply -f k8s/secret.yaml -f k8s/ollama.yaml -f k8s/dashboard.yaml -f k8s/cronjob.yaml
+```
+
+실제 클러스터 배포/동작 검증은 하지 못했다는 점을 명확히 기록한다 — 자세한 내용과 왜
+여기서 멈췄는지는 [PORTFOLIO_NOTES.md](PORTFOLIO_NOTES.md) 참고.
 
 ## 알려진 한계
 

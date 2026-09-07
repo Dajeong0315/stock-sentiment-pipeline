@@ -1,0 +1,52 @@
+# Assumes stock-sentiment-pipeline:latest is already available to the cluster's nodes
+# (push to a registry, or `kind load docker-image` / `minikube image load` for local clusters).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pipeline-data-pvc
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: dashboard}
+  template:
+    metadata:
+      labels: {app: dashboard}
+    spec:
+      containers:
+        - name: dashboard
+          image: stock-sentiment-pipeline:latest
+          imagePullPolicy: IfNotPresent
+          command: ["streamlit", "run", "dashboard/app.py", "--server.address", "0.0.0.0"]
+          ports:
+            - containerPort: 8501
+          envFrom:
+            - configMapRef: {name: stock-sentiment-config}
+            - secretRef: {name: stock-sentiment-secret}
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: pipeline-data-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dashboard
+spec:
+  type: ClusterIP
+  selector: {app: dashboard}
+  ports:
+    - port: 8501
+      targetPort: 8501

@@ -81,7 +81,7 @@ for w, c in zip(MA_WINDOWS, COLOR_MA):
     if f"ma_{w}" in feat_df.columns:
         fig.add_trace(go.Scatter(x=feat_df.index, y=feat_df[f"ma_{w}"], name=f"MA{w}", line=dict(color=c, width=1.3)))
 fig.update_layout(height=420, margin=dict(l=10, r=10, t=10, b=10), legend=dict(orientation="h", y=1.08))
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width="stretch")
 
 left, right = st.columns([2, 1])
 
@@ -93,7 +93,7 @@ with left:
     else:
         st.metric("일치율", f"{comparison['agreement_rate']:.1f}%", f"n={comparison['n_compared']}")
         table = comparison["table"][["news_date", "title", "rule_sentiment_score", "llm_sentiment_score", "agree"]]
-        st.dataframe(table, use_container_width=True, hide_index=True)
+        st.dataframe(table, width="stretch", hide_index=True)
         if comparison["disagreements"]:
             st.caption("대표 불일치 사례")
             for d in comparison["disagreements"]:
@@ -108,11 +108,11 @@ with right:
     if disclosures.empty:
         st.info("공시 데이터가 없습니다.")
     else:
-        st.dataframe(disclosures, use_container_width=True, hide_index=True)
+        st.dataframe(disclosures, width="stretch", hide_index=True)
 
 st.subheader("최신 뉴스")
 news_df = _load_news()
 if news_df.empty:
     st.info("뉴스 데이터가 없습니다.")
 else:
-    st.dataframe(news_df, use_container_width=True, hide_index=True)
+    st.dataframe(news_df, width="stretch", hide_index=True)

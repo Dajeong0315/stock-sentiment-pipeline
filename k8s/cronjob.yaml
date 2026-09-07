@@ -1,0 +1,29 @@
+# ponytail: shares pipeline-data-pvc (RWO) with the dashboard Deployment from dashboard.yaml —
+# fine on a single-node cluster (minikube/kind), but a real multi-node cluster would need RWX
+# storage or a real database instead of SQLite. Documented, not solved, for a mini project.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: stock-sentiment-daily-collect
+spec:
+  schedule: "0 8 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: collector
+              image: stock-sentiment-pipeline:latest
+              imagePullPolicy: IfNotPresent
+              command: ["python", "scripts/run_pipeline.py", "--mode", "scheduled"]
+              envFrom:
+                - configMapRef: {name: stock-sentiment-config}
+                - secretRef: {name: stock-sentiment-secret}
+              volumeMounts:
+                - name: data
+                  mountPath: /app/data
+          volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: pipeline-data-pvc
+          restartPolicy: OnFailure

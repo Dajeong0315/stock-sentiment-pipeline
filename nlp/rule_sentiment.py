@@ -1,7 +1,8 @@
 """Rule-based sentiment scoring: regex cleaning -> Kiwi morphological analysis -> lexicon lookup.
 
 Score is in [-1, 1]: (positive_hits - negative_hits) / total_tokens, with a naive
-negation flip when a negation morpheme appears within 2 tokens before a sentiment word.
+negation flip when a negation morpheme appears within 2 tokens either side of a sentiment
+word — Korean negates both ways ("안 좋다" precedes the stem, "좋지 않다" follows it).
 """
 from kiwipiepy import Kiwi
 
@@ -10,7 +11,7 @@ from nlp.text_clean import clean_text
 
 _kiwi = Kiwi()
 
-NEGATION_WINDOW = 2
+NEGATION_WINDOW = 4  # wide enough to bridge "-되지 않다"-style suffix chains (stem+되+지+않)
 
 
 def score_text(raw_text: str) -> float:
@@ -34,7 +35,9 @@ def score_text(raw_text: str) -> float:
             continue
 
         window_start = max(0, i - NEGATION_WINDOW)
-        if any(f in NEGATION_WORDS for f in forms[window_start:i]):
+        window_end = min(len(forms), i + 1 + NEGATION_WINDOW)
+        nearby = forms[window_start:i] + forms[i + 1 : window_end]
+        if any(f in NEGATION_WORDS for f in nearby):
             polarity *= -1
 
         hits += polarity

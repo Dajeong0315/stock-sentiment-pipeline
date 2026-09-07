@@ -4,7 +4,6 @@ import logging
 import subprocess
 from datetime import datetime
 
-import numpy as np
 import pandas as pd
 
 import config
@@ -132,7 +131,12 @@ def render_metrics(model_results: dict = None, comparison_result: dict = None, r
     lines.append("")
 
     lines.append("## 확장 범위 진행 상태")
-    lines.append("- Docker / Kubernetes: 미착수 (MVP 우선 완료 정책에 따라 확장 단계 진입 전)")
+    lines.append("- Docker: 완료 — 이미지 크기 2.65GB (빌드 및 `docker compose up` 실구동 검증 완료)")
+    lines.append(
+        "- Kubernetes: 매니페스트 작성 + `kubeconform` 오프라인 스키마 검증 통과(9개 리소스) — "
+        "**실제 클러스터 배포는 미완료** (이 환경에 연결 가능한 클러스터 없음)"
+    )
+    lines.append("- GitHub Actions CI: 린트/테스트 워크플로 작성 및 로컬 통과 확인 (ruff, pytest 16건)")
     lines.append("")
 
     return "\n".join(lines)

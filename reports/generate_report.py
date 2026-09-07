@@ -68,7 +68,10 @@ def generate_report(ticker: str = None) -> dict:
             lines.append(f"- 비교 차트: `{chart_path.relative_to(config.BASE_DIR)}`")
         lines.append("- 대표 불일치 사례:")
         for d in comparison["disagreements"]:
-            lines.append(f"  - \"{d['title']}\" (규칙기반 {d['rule_sentiment_score']:+.2f} / LLM {d['llm_sentiment_score']:+.2f})")
+            lines.append(
+                f"  - \"{d['title']}\" (규칙기반 {d['rule_sentiment_score']:+.2f} / "
+                f"LLM {d['llm_sentiment_score']:+.2f})"
+            )
     else:
         lines.append("- 비교할 LLM 감정점수 없음")
     lines.append("")

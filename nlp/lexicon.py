@@ -16,4 +16,4 @@ NEGATIVE_WORDS = {
     "배임", "고발", "의혹", "혐의", "기소", "수사", "압수수색", "부정수급",
 }
 
-NEGATION_WORDS = {"안", "못", "없", "아니"}
+NEGATION_WORDS = {"안", "못", "없", "아니", "않"}  # "않" covers the common "-지 않다" negation pattern

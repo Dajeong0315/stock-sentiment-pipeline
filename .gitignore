@@ -9,3 +9,4 @@ logs/*.log
 *.egg-info/
 .streamlit/
 chromedriver*
+k8s/secret.yaml

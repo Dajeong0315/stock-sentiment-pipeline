@@ -1,0 +1,11 @@
+.venv/
+.git/
+__pycache__/
+*.pyc
+.env
+data/*.sqlite
+logs/*.log
+reports/output/*.png
+reports/output/report_*.md
+.claude/
+k8s/

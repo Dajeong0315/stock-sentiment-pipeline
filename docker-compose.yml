@@ -1,0 +1,36 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama_models:/root/.ollama
+    ports:
+      - "11434:11434"
+
+  dashboard:
+    build: .
+    env_file: .env
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    depends_on:
+      - ollama
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data
+      - ./reports/output:/app/reports/output
+
+  scheduler:
+    build: .
+    command: ["python", "-m", "scheduler.daily_job"]
+    env_file: .env
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    depends_on:
+      - ollama
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./reports/output:/app/reports/output
+
+volumes:
+  ollama_models:
